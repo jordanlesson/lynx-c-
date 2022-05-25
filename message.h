@@ -24,8 +24,22 @@ class Message{
         int flag;
         std::string data; 
         std::string timestamp;
+        Message (){
+                     //Initializes a message object, does *not* check if information is None
+
+            this->debug = 0;
+
+            this->type = "";
+            this->flag = 0;
+            this->data = "";
+            //figure out a way to use clock online or something, uses local time 
+            std::time_t t = std::chrono::_V2::system_clock::to_time_t(std::chrono::system_clock::now());
+            this->timestamp = ctime(&t);
+        }
+
+
         // ------------------------------------------------------------------------------
-        void __init__ (std::string type, int flag, auto data) {
+        Message (std::string type, int flag, std::string data) {
             // --------------------------------------------------------------------------
             //Initializes a message object, does *not* check if information is None
 
@@ -35,12 +49,12 @@ class Message{
             this->flag = flag;
             this->data = data;
             //figure out a way to use clock online or something, uses local time 
-            std::time_t t = to_time_t(std::chrono::system_clock::now());
+            std::time_t t = std::chrono::_V2::system_clock::to_time_t(std::chrono::system_clock::now());
             this->timestamp = ctime(&t);
         }  
 
         // ------------------------------------------------------------------------------
-        void __debug(auto message){
+        void __debug(std::string message){
             // --------------------------------------------------------------------------
             //Prints a message to the screen with the id of the current thread
             if (this->debug) {
@@ -81,7 +95,7 @@ class Message{
                 return false;
             }
 
-            __debug('Message is valid!');
+            __debug("Message is valid!");
             return true;
         
         }
@@ -104,8 +118,9 @@ class Message{
         }
 
         //@classmethod
+        //EQUIVILENT TO THE FROM_JSON FUNCTION
         // ------------------------------------------------------------------------------
-        void from_JSON(std::string JSON){
+        Message (std::string JSON){
             //# --------------------------------------------------------------------------
             /*Returns a Message object given a JSON input. If JSON is not formatted 
             correctly, this method will return None.*/
@@ -115,17 +130,17 @@ class Message{
             for (auto& it : data.items()){
                 //todo: figure out a more efficient way of doing this
                 if (it.key().compare("type")){
-                    this->type == it.value();
+                    this->type = it.value();
                 }//type
 
                 //TODO: this shit is super wrong, have the else just in case
                 else if (it.key().compare("debug")){
                     if (it.value() == "true"){
-                        this->debug == 1;
+                        this->debug = 1;
                     }
 
                     else if (it.value() == "false"){
-                        this->debug == 0;
+                        this->debug = 0;
                     }
 
                     else{
@@ -134,7 +149,7 @@ class Message{
                 }//debug
 
                 else if (it.key().compare("flag")){
-                    this->flag = stoi(it.value());
+                    this->flag = std::__cxx11::stoi(it.value());
                 }//flag
 
                 else if (it.key().compare("data")){
@@ -161,7 +176,7 @@ class SignedMessage{
     public:
     
     //  ------------------------------------------------------------------------------
-    void __init__(Message message, std::string signature){ 
+    SignedMessage(Message message, std::string signature){ 
         //  --------------------------------------------------------------------------
         // Initializes a the signature of a SignedMesage 
 
@@ -173,7 +188,7 @@ class SignedMessage{
     void __debug(){
         // --------------------------------------------------------------------------
         if (this->message.debug){
-            printf("[%s] %s",  std::this_thread::get_id(), message);
+            printf("[%s] %i",  std::this_thread::get_id(), message.debug);
         }
     }
 
@@ -202,17 +217,15 @@ class SignedMessage{
     }
 
     // ------------------------------------------------------------------------------
-    void from_JSON(std::string JSON){
+    SignedMessage(std::string JSON){
         //  --------------------------------------------------------------------------
         /*Returns a SignedMessage object given a JSON input. If JSON is not formatted 
         correctly, this method will return None.*/
-        Message message;
-        message.from_JSON(JSON);
+        Message message(JSON);
         nlohmann::json j = nlohmann::json::parse(JSON);
 
 
-        SignedMessage signed_message;
-        signed_message.__init__(message, j.at("signature"));        
+        SignedMessage signed_message(message, j.at("signature"));        
     }
     
 };
