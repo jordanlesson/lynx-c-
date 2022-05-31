@@ -58,7 +58,7 @@ class Message{
             // --------------------------------------------------------------------------
             //Prints a message to the screen with the id of the current thread
             if (this->debug) {
-                printf("[%s], %s",  std::this_thread::get_id(), message);
+                std::cout << "[" << std::this_thread::get_id() << "] " << message;
             }
         }
 
@@ -170,11 +170,11 @@ class SignedMessage{
     //TODO: check if the signature should be a string or what 
 
     //Manages any actions made with a signed message. Inherits attributes from the Message class.
-    private:
-        Message message; 
-        std::string signature;
+
     public:
-    
+    Message message; 
+    std::string signature;
+
     //  ------------------------------------------------------------------------------
     SignedMessage(Message message, std::string signature){ 
         //  --------------------------------------------------------------------------
@@ -188,7 +188,7 @@ class SignedMessage{
     void __debug(){
         // --------------------------------------------------------------------------
         if (this->message.debug){
-            printf("[%s] %i",  std::this_thread::get_id(), message.debug);
+            std::cout << "[" << std::this_thread::get_id() << "] " << message.debug;
         }
     }
 
